@@ -46,11 +46,13 @@
             });
 
             if (response.ok) {
-                alert('Регистрация успешна! Теперь вы можете войти.');
-                window.location.href = '/Home/Login';
+                showNotification('Регистрация успешна! Теперь вы можете войти.');
+                setTimeout(() => {
+                    window.location.href = '/Home/Login';
+                }, 1500);
             } else {
                 const error = await response.text();
-                alert(error);
+                showNotification(error, 'error');
             }
         });
     </script>
