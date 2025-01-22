@@ -93,8 +93,20 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            // Сначала удаляем элемент из DOM
+                            const productCard = document.querySelector(`[onclick="removeFromWishlist(${productId})"]`).closest('.col');
+                            productCard.remove();
+                            
+                            // Проверяем, остались ли еще товары
+                            const remainingProducts = document.querySelectorAll('.col');
+                            if (remainingProducts.length === 0) {
+                                // Если товаров не осталось, показываем сообщение
+                                const container = document.querySelector('.row');
+                                container.innerHTML = '<div class="alert alert-info w-100">Ваш список желаемого пуст</div>';
+                            }
+                            
+                            // Затем показываем уведомление
                             showNotification('Товар успешно удален из списка желаемого');
-                            window.location.reload();
                         } else {
                             showNotification('Не удалось удалить товар', 'error');
                         }
