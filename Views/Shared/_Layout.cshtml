@@ -549,19 +549,35 @@
 
         // Функция обновления общей суммы
         function updateTotalPrice() {
-            const totalElement = document.querySelector('.cart-total');
-            if (totalElement) {
-                const rows = document.querySelectorAll('tr[data-product-id]');
-                let total = 0;
-                
-                rows.forEach(row => {
-                    const priceText = row.querySelector('.product-price').textContent;
-                    const quantity = parseInt(row.querySelector('.quantity-input').value);
+            const rows = document.querySelectorAll('tr[data-product-id]');
+            let total = 0;
+            
+            rows.forEach(row => {
+                const priceCell = row.querySelector('td:nth-child(4)');  // Ячейка с итоговой ценой
+                if (priceCell) {
+                    const priceText = priceCell.textContent;
                     const price = parseFloat(priceText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                    total += price * quantity;
-                });
-                
-                totalElement.textContent = `Общая сумма: ${total.toLocaleString('ru-RU')} ₽`;
+                    if (!isNaN(price)) {
+                        total += price;
+                    }
+                }
+            });
+
+            // Обновляем все элементы с общей суммой
+            const totalRow = document.querySelector('tfoot tr');
+            if (totalRow) {
+                totalRow.innerHTML = `
+                    <td colspan="3" class="text-end"><strong>Общая сумма:</strong></td>
+                    <td><strong>${total.toLocaleString('ru-RU')} ₽</strong></td>
+                    <td></td>
+                `;
+            }
+
+            // Обновляем заголовок корзины
+            const cartTitle = document.querySelector('h2');
+            if (cartTitle) {
+                const itemCount = rows.length;
+                cartTitle.textContent = `Корзина (${itemCount})`;
             }
         }
 
@@ -597,17 +613,16 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Очищаем содержимое корзины
-                            const container = document.querySelector('.row');
-                            container.innerHTML = '<div class="alert alert-info w-100">Ваша корзина пуста</div>';
-                            
-                            // Скрываем кнопки корзины
-                            const cartButtons = document.querySelector('.cart-buttons');
-                            if (cartButtons) {
-                                cartButtons.style.display = 'none';
+                            // Обновляем весь контейнер
+                            const container = document.querySelector('.container.mt-4');
+                            if (container) {
+                                container.innerHTML = `
+                                    <h2>Корзина (0)</h2>
+                                    <div class="alert alert-info">Ваша корзина пуста</div>
+                                `;
                             }
                             
-                            // Обновляем счетчик
+                            // Обновляем счетчик корзины
                             updateCartCount();
                             
                             // Показываем уведомление
