@@ -1,73 +1,100 @@
+@model BootS.Models.User
 @{
     ViewData["Title"] = "Пополнение баланса";
 }
 
-<div class="container">
+<div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Пополнение баланса</h2>
-                    <div class="mb-4">
-                        <label>Текущий баланс</label>
-                        <h4 id="currentBalance" class="text-primary">0 ₽</h4>
+            <div class="balance-card">
+                <div class="balance-header">
+                    <h2>Пополнение баланса</h2>
+                    <div class="current-balance">
+                        <span class="balance-label">Текущий баланс</span>
+                        <span class="balance-amount">@Model.Balance.ToString("C")</span>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <div class="payment-tabs">
+                        <button type="button" class="payment-tab active" data-method="card">
+                            <i class="bi bi-credit-card"></i>
+                            <span>Банковская карта</span>
+                        </button>
+                        <button type="button" class="payment-tab" data-method="sbp">
+                            <i class="bi bi-phone"></i>
+                            <span>СБП</span>
+                        </button>
                     </div>
 
-                    <!-- Вкладки -->
-                    <ul class="nav nav-tabs mb-4" id="paymentTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="card-tab" data-bs-toggle="tab" data-bs-target="#card" type="button" role="tab">
-                                <i class="bi bi-credit-card"></i> Банковская карта
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="sbp-tab" data-bs-toggle="tab" data-bs-target="#sbp" type="button" role="tab">
-                                <i class="bi bi-phone"></i> СБП
-                            </button>
-                        </li>
-                    </ul>
+                    <!-- Форма оплаты картой -->
+                    <div class="payment-form active" id="cardForm">
+                        <form id="cardPaymentForm" novalidate>
+                            <div class="form-group">
+                                <label>Номер карты</label>
+                                <input type="text" class="form-control" id="cardNumber" required 
+                                       pattern="\d{16}" maxlength="19" placeholder="0000 0000 0000 0000">
+                                <div class="invalid-feedback">Введите корректный номер карты</div>
+                            </div>
 
-                    <!-- Содержимое вкладок -->
-                    <div class="tab-content" id="paymentTabsContent">
-                        <!-- Вкладка оплаты картой -->
-                        <div class="tab-pane fade show active" id="card" role="tabpanel">
-                            <form id="balanceForm">
-                                <div class="mb-3">
-                                    <label for="cardNumber" class="form-label">Номер карты</label>
-                                    <input type="text" class="form-control" id="cardNumber" maxlength="19" placeholder="0000 0000 0000 0000" required>
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <label>Срок действия</label>
+                                    <input type="text" class="form-control" id="expiryDate" required
+                                           pattern="\d{2}/\d{2}" maxlength="5" placeholder="MM/YY">
+                                    <div class="invalid-feedback">Введите корректный срок действия</div>
                                 </div>
-                                <div class="row mb-3">
-                                    <div class="col-6">
-                                        <label for="expiryDate" class="form-label">Срок действия (ММ/ГГ)</label>
-                                        <input type="text" class="form-control" id="expiryDate" maxlength="5" placeholder="MM/YY" required>
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="cvv" class="form-label">CVV</label>
-                                        <input type="password" class="form-control" id="cvv" maxlength="3" placeholder="***" required>
-                                    </div>
+                                <div class="form-group col-6">
+                                    <label>CVV</label>
+                                    <input type="password" class="form-control" id="cvv" required
+                                           pattern="\d{3}" maxlength="3" placeholder="***">
+                                    <div class="invalid-feedback">Введите CVV код</div>
                                 </div>
-                                <div class="mb-4">
-                                    <label for="amount" class="form-label">Сумма пополнения</label>
-                                    <input type="number" class="form-control" id="amount" min="1" max="750000" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">Пополнить</button>
-                            </form>
-                        </div>
+                            </div>
 
-                        <!-- Вкладка СБП -->
-                        <div class="tab-pane fade" id="sbp" role="tabpanel">
-                            <form id="sbpForm">
-                                <div class="mb-4">
-                                    <label for="sbpAmount" class="form-label">Сумма пополнения</label>
-                                    <input type="number" class="form-control" id="sbpAmount" min="1" max="750000" required>
+                            <div class="form-group">
+                                <label>Сумма пополнения</label>
+                                <div class="amount-input">
+                                    <input type="number" class="form-control" id="cardAmount" required
+                                           min="1" max="750000" placeholder="Введите сумму">
+                                    <span class="currency">₽</span>
+                                    <div class="invalid-feedback">Сумма должна быть от 1 до 750 000 ₽</div>
                                 </div>
-                                <div class="mb-4">
-                                    <label for="phoneNumber" class="form-label">Номер телефона</label>
-                                    <input type="tel" class="form-control" id="phoneNumber" placeholder="+7 (___) ___-__-__" required>
+                            </div>
+
+                            <button type="submit" class="btn-submit">
+                                <i class="bi bi-lock-fill"></i>
+                                Пополнить
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Форма оплаты СБП -->
+                    <div class="payment-form" id="sbpForm">
+                        <form id="sbpPaymentForm" novalidate>
+                            <div class="form-group">
+                                <label>Номер телефона</label>
+                                <input type="tel" class="form-control" id="phoneNumber" required
+                                       pattern="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}" 
+                                       placeholder="+7 (___) ___-__-__">
+                                <div class="invalid-feedback">Введите корректный номер телефона</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Сумма пополнения</label>
+                                <div class="amount-input">
+                                    <input type="number" class="form-control" id="sbpAmount" required
+                                           min="1" max="750000" placeholder="Введите сумму">
+                                    <span class="currency">₽</span>
+                                    <div class="invalid-feedback">Сумма должна быть от 1 до 750 000 ₽</div>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100">Оплатить через СБП</button>
-                            </form>
-                        </div>
+                            </div>
+
+                            <button type="submit" class="btn-submit">
+                                <i class="bi bi-lock-fill"></i>
+                                Оплатить через СБП
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -75,142 +102,546 @@
     </div>
 </div>
 
+<style>
+    .balance-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+    }
+
+    .balance-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .balance-header h2 {
+        font-size: 1.75rem;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+    }
+
+    .current-balance {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .balance-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .balance-amount {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #0d6efd;
+    }
+
+    .method-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .payment-option {
+        flex: 1;
+    }
+
+    .payment-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        width: 100%;
+    }
+
+    input[type="radio"] {
+        display: none;
+    }
+
+    input[type="radio"]:checked + .payment-label {
+        background: #e7f1ff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .payment-label i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #495057;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .amount-input {
+        position: relative;
+    }
+
+    .amount-input .currency {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        background: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background: #0b5ed7;
+        transform: translateY(-2px);
+    }
+
+    .btn-submit i {
+        font-size: 1.1rem;
+    }
+
+    #paymentForms {
+        position: relative;
+    }
+
+    .payment-form {
+        transition: opacity 0.3s ease;
+    }
+
+    #sbpForm {
+        display: none;
+        opacity: 0;
+    }
+
+    .payment-form.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .payment-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .payment-tab {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border: 2px solid transparent;
+        border-radius: 12px;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .payment-tab.active {
+        background: #e7f1ff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .payment-tab i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .payment-form {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .payment-form.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .invalid-feedback {
+        display: none;
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .form-control.is-invalid + .invalid-feedback {
+        display: block;
+    }
+
+    /* Стили для уведомлений */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+    }
+
+    .notification.success {
+        border-left: 4px solid #28a745;
+    }
+
+    .notification.error {
+        border-left: 4px solid #dc3545;
+    }
+
+    .notification-icon {
+        margin-right: 15px;
+        font-size: 1.5rem;
+    }
+
+    .notification.success .notification-icon {
+        color: #28a745;
+    }
+
+    .notification.error .notification-icon {
+        color: #dc3545;
+    }
+
+    .notification-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .notification-message {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .notification.fade-out {
+        animation: slideOut 0.3s ease forwards;
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+
+    @@keyframes spin {
+        from { 
+            transform: rotate(0deg); 
+        }
+        to { 
+            transform: rotate(360deg); 
+        }
+    }
+
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+
+    .notification {
+        animation: slideIn 0.3s ease;
+    }
+
+    .notification.fade-out {
+        animation: slideOut 0.3s ease forwards;
+    }
+</style>
+
 @section Scripts {
     <script>
-        // Конфигурация toastr
-        toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-bottom-right",
-            "timeOut": "5000",
-            "extendedTimeOut": "2000",
-            "preventDuplicates": true
-        };
+        // Переключение между методами оплаты
+        document.querySelectorAll('.payment-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Убираем активный класс у всех табов
+                document.querySelectorAll('.payment-tab').forEach(t => t.classList.remove('active'));
+                // Добавляем активный класс текущему табу
+                this.classList.add('active');
 
-        // Обработка ввода суммы для карты
-        document.getElementById('amount').addEventListener('input', function(e) {
-            const value = parseFloat(this.value);
-            if (value > 750000) {
-                toastr.warning('Пожалуйста, выберите значение не более 750000 ₽');
-                this.value = 750000;
-            }
-        });
+                // Скрываем все формы
+                document.querySelectorAll('.payment-form').forEach(form => {
+                    form.classList.remove('active');
+                });
 
-        // Обработка ввода суммы для СБП
-        document.getElementById('sbpAmount').addEventListener('input', function(e) {
-            const value = parseFloat(this.value);
-            if (value > 750000) {
-                toastr.warning('Пожалуйста, выберите значение не более 750000 ₽');
-                this.value = 750000;
-            }
+                // Показываем нужную форму
+                const method = this.dataset.method;
+                const form = document.getElementById(method + 'Form');
+                form.classList.add('active');
+            });
         });
 
         // Форматирование номера карты
-        document.getElementById('cardNumber').addEventListener('input', function(e) {
+        const cardNumber = document.getElementById('cardNumber');
+        cardNumber.addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
-            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-            if (value.length > 19) {
-                value = value.slice(0, 19);
-            }
+            value = value.replace(/(\d{4})/g, '$1 ').trim();
             this.value = value;
+            validateInput(this, /^\d{16}$/);
         });
 
-        // Форматирование срока действия
-        document.getElementById('expiryDate').addEventListener('input', function(e) {
+        // Форматирование и валидация срока действия
+        const expiryDate = document.getElementById('expiryDate');
+        expiryDate.addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
             if (value.length >= 2) {
                 value = value.slice(0,2) + '/' + value.slice(2);
             }
             this.value = value;
+            validateExpiryDate(this);
         });
 
         // Форматирование CVV
-        document.getElementById('cvv').addEventListener('input', function(e) {
+        const cvv = document.getElementById('cvv');
+        cvv.addEventListener('input', function(e) {
             this.value = this.value.replace(/\D/g, '');
+            validateInput(this, /^\d{3}$/);
         });
-
-        // Загрузка текущего баланса
-        function loadCurrentBalance() {
-            fetch('/Balance/GetBalance')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('currentBalance').textContent = 
-                        new Intl.NumberFormat('ru-RU').format(data.balance) + ' ₽';
-                });
-        }
-
-        // Обработка формы
-        document.getElementById('balanceForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const data = {
-                cardNumber: document.getElementById('cardNumber').value.replace(/\s/g, ''), // Удаляем пробелы
-                expiryDate: document.getElementById('expiryDate').value,
-                cvv: document.getElementById('cvv').value,
-                amount: parseFloat(document.getElementById('amount').value)
-            };
-
-            fetch('/Balance/UpdateBalance', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    toastr.success('Баланс успешно пополнен');
-                    loadCurrentBalance();
-                    this.reset(); // Очищаем форму после успешного пополнения
-                    if (window.updateUserBalance) {
-                        window.updateUserBalance();
-                    }
-                } else {
-                    toastr.error(result.message);
-                }
-            })
-            .catch(error => {
-                toastr.error('Произошла ошибка при пополнении баланса');
-            });
-        });
-
-        // Загружаем баланс при загрузке страницы
-        loadCurrentBalance();
 
         // Форматирование номера телефона
-        document.getElementById('phoneNumber').addEventListener('input', function(e) {
+        const phoneNumber = document.getElementById('phoneNumber');
+        phoneNumber.addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
             if (value.length > 0) {
-                if (value[0] === '7' || value[0] === '8') {
-                    value = '7' + value.slice(1);
-                }
-                let formattedValue = '';
-                if (value.length > 0) formattedValue += '+7 ';
-                if (value.length > 1) formattedValue += '(' + value.slice(1, 4);
-                if (value.length > 4) formattedValue += ') ' + value.slice(4, 7);
-                if (value.length > 7) formattedValue += '-' + value.slice(7, 9);
-                if (value.length > 9) formattedValue += '-' + value.slice(9, 11);
-                this.value = formattedValue;
+                value = '+7' + value.slice(value.startsWith('7') ? 1 : 0);
+                if (value.length > 2) value = value.slice(0,2) + ' (' + value.slice(2);
+                if (value.length > 7) value = value.slice(0,7) + ') ' + value.slice(7);
+                if (value.length > 12) value = value.slice(0,12) + '-' + value.slice(12);
+                if (value.length > 15) value = value.slice(0,15) + '-' + value.slice(15);
             }
+            this.value = value;
+            validateInput(this, /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/);
         });
 
-        // Обработка формы СБП
-        document.getElementById('sbpForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const data = {
-                cardNumber: "0000000000000000", // Фиктивный номер карты для СБП
-                expiryDate: "01/99", // Фиктивная дата
-                cvv: "000", // Фиктивный CVV
-                amount: parseFloat(document.getElementById('sbpAmount').value)
-            };
+        // Валидация полей
+        function validateInput(input, pattern) {
+            const isValid = pattern.test(input.value.replace(/\s/g, ''));
+            input.classList.toggle('is-invalid', !isValid);
+            return isValid;
+        }
 
-            if (data.amount > 750000) {
-                toastr.warning('Пожалуйста, выберите значение не более 750000.');
+        // Функция валидации срока действия карты
+        function validateExpiryDate(input) {
+            const value = input.value;
+            const pattern = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
+            
+            if (!pattern.test(value)) {
+                input.classList.add('is-invalid');
+                input.nextElementSibling.textContent = 'Неверный формат даты';
+                return false;
+            }
+
+            const [month, year] = value.split('/');
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear() % 100;
+            const currentMonth = currentDate.getMonth() + 1;
+            const expYear = parseInt(year);
+            const expMonth = parseInt(month);
+
+            // Проверка на прошедший год
+            if (expYear < currentYear) {
+                input.classList.add('is-invalid');
+                input.nextElementSibling.textContent = 'Карта просрочена';
+                return false;
+            }
+
+            // Проверка на текущий год и прошедший месяц
+            if (expYear === currentYear && expMonth < currentMonth) {
+                input.classList.add('is-invalid');
+                input.nextElementSibling.textContent = 'Карта просрочена';
+                return false;
+            }
+
+            // Проверка на слишком далекий срок действия (более 10 лет)
+            if (expYear > currentYear + 10) {
+                input.classList.add('is-invalid');
+                input.nextElementSibling.textContent = 'Недопустимый срок действия карты';
+                return false;
+            }
+
+            input.classList.remove('is-invalid');
+            return true;
+        }
+
+        // Обновляем обработчик формы
+        document.getElementById('cardPaymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const cardValid = validateInput(cardNumber, /^\d{16}$/);
+            const dateValid = validateExpiryDate(expiryDate);
+            const cvvValid = validateInput(cvv, /^\d{3}$/);
+            const amount = document.getElementById('cardAmount');
+            const amountValue = parseFloat(amount.value);
+
+            // Проверка суммы
+            if (isNaN(amountValue) || amountValue < 1 || amountValue > 750000) {
+                showNotification({
+                    type: 'error',
+                    title: 'Ошибка!',
+                    message: 'Сумма должна быть от 1 до 750 000 ₽'
+                });
+                amount.classList.add('is-invalid');
                 return;
             }
 
+            if (!cardValid || !dateValid || !cvvValid) {
+                showNotification({
+                    type: 'error',
+                    title: 'Ошибка!',
+                    message: 'Пожалуйста, проверьте правильность заполнения полей'
+                });
+                return;
+            }
+
+            const data = {
+                cardNumber: cardNumber.value.replace(/\s/g, ''),
+                expiryDate: expiryDate.value,
+                cvv: cvv.value,
+                amount: amountValue
+            };
+
+            submitPayment(data);
+        });
+
+        // Обработка формы СБП
+        document.getElementById('sbpPaymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const phoneValid = validateInput(phoneNumber, /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/);
+            const amount = document.getElementById('sbpAmount');
+            const amountValue = parseFloat(amount.value);
+
+            // Проверка суммы
+            if (isNaN(amountValue) || amountValue < 1 || amountValue > 750000) {
+                showNotification({
+                    type: 'error',
+                    title: 'Ошибка!',
+                    message: 'Сумма должна быть от 1 до 750 000 ₽'
+                });
+                amount.classList.add('is-invalid');
+                return;
+            }
+
+            if (!phoneValid) {
+                showNotification({
+                    type: 'error',
+                    title: 'Ошибка!',
+                    message: 'Введите корректный номер телефона'
+                });
+                return;
+            }
+
+            const data = {
+                cardNumber: "0000000000000000",
+                expiryDate: "01/99",
+                cvv: "000",
+                amount: amountValue
+            };
+
+            submitPayment(data);
+        });
+
+        // Функция для показа уведомлений
+        function showNotification({ type, title, message }) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="bi bi-${type === 'success' ? 'check' : 'x'}-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Обновляем функцию отправки данных
+        function submitPayment(data) {
+            // Показываем индикатор загрузки
+            const submitButton = document.querySelector('.payment-form.active .btn-submit');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Обработка...';
+            submitButton.disabled = true;
+
             fetch('/Balance/UpdateBalance', {
                 method: 'POST',
                 headers: {
@@ -221,19 +652,59 @@
             .then(response => response.json())
             .then(result => {
                 if (result.success) {
-                    toastr.success('Баланс успешно пополнен');
-                    loadCurrentBalance();
-                    this.reset(); // Очищаем форму после успешного пополнения
-                    if (window.updateUserBalance) {
-                        window.updateUserBalance();
+                    // Показываем уведомление об успехе
+                    showNotification({
+                        type: 'success',
+                        title: 'Успешно!',
+                        message: 'Баланс успешно пополнен'
+                    });
+                    
+                    // Обновляем отображение баланса на странице
+                    document.querySelector('.balance-amount').textContent = 
+                        new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' })
+                            .format(result.newBalance);
+                    
+                    // Обновляем баланс в шапке сайта
+                    const balanceText = `Баланс: ${new Intl.NumberFormat('ru-RU', { 
+                        style: 'currency', 
+                        currency: 'RUB' 
+                    }).format(result.newBalance)}`;
+
+                    // Обновляем все возможные места отображения баланса
+                    document.querySelectorAll('[data-balance]').forEach(el => {
+                        el.textContent = balanceText;
+                    });
+
+                    // Обновляем баланс в навигационной панели
+                    const navBalance = document.querySelector('.nav-link[href="/Balance"] span');
+                    if (navBalance) {
+                        navBalance.textContent = balanceText;
                     }
+
+                    // Очищаем формы
+                    document.querySelectorAll('form').forEach(form => form.reset());
                 } else {
-                    toastr.error(result.message);
+                    // Показываем уведомление об ошибке
+                    showNotification({
+                        type: 'error',
+                        title: 'Ошибка!',
+                        message: result.message || 'Произошла ошибка при пополнении баланса'
+                    });
                 }
             })
             .catch(error => {
-                toastr.error('Произошла ошибка при пополнении баланса');
+                // Показываем уведомление об ошибке
+                showNotification({
+                    type: 'error',
+                    title: 'Ошибка!',
+                    message: 'Произошла ошибка при пополнении баланса'
+                });
+            })
+            .finally(() => {
+                // Восстанавливаем кнопку
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
             });
-        });
+        }
     </script>
 } 
