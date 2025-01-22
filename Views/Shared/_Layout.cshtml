@@ -477,11 +477,22 @@
                 title: 'Удаление товара',
                 text: 'Вы действительно хотите удалить этот товар из корзины?',
                 icon: 'question',
+                iconColor: '#dc3545',
                 showCancelButton: true,
-                confirmButtonText: 'Да',
+                confirmButtonText: 'Удалить',
                 cancelButtonText: 'Отмена',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33'
+                customClass: {
+                    confirmButton: 'btn btn-danger',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: true,
+                reverseButtons: true,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch('/Cart/RemoveFromCart', {
@@ -494,10 +505,37 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            showNotification('Товар успешно удален из корзины');
-                            window.location.reload();
-                        }
-                        else {
+                            // Находим строку таблицы с товаром
+                            const productRow = document.querySelector(`tr[data-product-id="${productId}"]`);
+                            if (productRow) {
+                                productRow.remove();
+                                
+                                // Обновляем счетчик корзины
+                                updateCartCount();
+                                
+                                // Обновляем общую сумму
+                                updateTotalPrice();
+                                
+                                // Проверяем, остались ли еще товары
+                                const remainingProducts = document.querySelectorAll('tr[data-product-id]');
+                                if (remainingProducts.length === 0) {
+                                    // Если товаров не осталось, обновляем весь контейнер
+                                    const container = document.querySelector('.container.mt-4');
+                                    if (container) {
+                                        container.innerHTML = `
+                                            <h2>Корзина (0)</h2>
+                                            <div class="alert alert-info">Ваша корзина пуста</div>
+                                        `;
+                                    }
+                                }
+                                
+                                // Показываем уведомление
+                                showNotification('Товар успешно удален из корзины');
+                            } else {
+                                // Если элемент не найден, просто перезагружаем страницу
+                                window.location.reload();
+                            }
+                        } else {
                             showNotification('Не удалось удалить товар', 'error');
                         }
                     })
@@ -509,16 +547,45 @@
             });
         }
 
+        // Функция обновления общей суммы
+        function updateTotalPrice() {
+            const totalElement = document.querySelector('.cart-total');
+            if (totalElement) {
+                const rows = document.querySelectorAll('tr[data-product-id]');
+                let total = 0;
+                
+                rows.forEach(row => {
+                    const priceText = row.querySelector('.product-price').textContent;
+                    const quantity = parseInt(row.querySelector('.quantity-input').value);
+                    const price = parseFloat(priceText.replace(/[^\d.,]/g, '').replace(',', '.'));
+                    total += price * quantity;
+                });
+                
+                totalElement.textContent = `Общая сумма: ${total.toLocaleString('ru-RU')} ₽`;
+            }
+        }
+
         function clearCart() {
             Swal.fire({
                 title: 'Очистка корзины',
                 text: 'Вы действительно хотите очистить корзину?',
                 icon: 'question',
+                iconColor: '#dc3545',
                 showCancelButton: true,
-                confirmButtonText: 'Да',
+                confirmButtonText: 'Очистить',
                 cancelButtonText: 'Отмена',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33'
+                customClass: {
+                    confirmButton: 'btn btn-danger',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: true,
+                reverseButtons: true,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch('/Cart/ClearCart', {
@@ -530,10 +597,22 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            // Очищаем содержимое корзины
+                            const container = document.querySelector('.row');
+                            container.innerHTML = '<div class="alert alert-info w-100">Ваша корзина пуста</div>';
+                            
+                            // Скрываем кнопки корзины
+                            const cartButtons = document.querySelector('.cart-buttons');
+                            if (cartButtons) {
+                                cartButtons.style.display = 'none';
+                            }
+                            
+                            // Обновляем счетчик
+                            updateCartCount();
+                            
+                            // Показываем уведомление
                             showNotification('Корзина успешно очищена');
-                            window.location.reload();
-                        }
-                        else {
+                        } else {
                             showNotification('Не удалось очистить корзину', 'error');
                         }
                     })
