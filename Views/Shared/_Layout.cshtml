@@ -311,6 +311,36 @@
             margin: 0 !important;
             padding: 0.5rem 0 !important;
         }
+
+        /* Стили для ссылки категорий */
+        .category-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .category-link:hover {
+            background-color: #f8f9fa;
+        }
+
+        .category-link .bi-grid {
+            font-size: 1.1rem;
+            color: #0d6efd;
+            transition: transform 0.3s ease;
+        }
+
+        .category-link:hover .bi-grid {
+            transform: scale(1.1);
+        }
+
+        .category-link span {
+            color: #212529;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -327,8 +357,9 @@
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Category" asp-action="Index">
-                                <i class="bi bi-grid"></i> Категории
+                            <a class="nav-link category-link" asp-controller="Category" asp-action="Index">
+                                <i class="bi bi-grid"></i>
+                                <span>Категории</span>
                             </a>
                         </li>
                         <li class="nav-item flex-grow-1">
