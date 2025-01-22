@@ -80,6 +80,19 @@
     </div>
 </div>
 
+<div class="success-modal">
+    <div class="success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </svg>
+    </div>
+    <h3>Заказ оформлен!</h3>
+    <p>Ваш заказ успешно оформлен и принят в обработку</p>
+    <button class="btn btn-primary" onclick="window.location.href='/Order/History'">
+        Перейти к заказам
+    </button>
+</div>
+
 @section Scripts {
     <script>
         function placeOrder() {
@@ -96,6 +109,12 @@
                 return;
             }
 
+            // Показываем индикатор загрузки на кнопке
+            const submitButton = document.querySelector('button[onclick="placeOrder()"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Обработка...';
+
             fetch('/Order/PlaceOrder', {
                 method: 'POST',
                 headers: {
@@ -106,21 +125,35 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    Swal.fire({
-                        title: 'Заказ оформлен!',
-                        text: 'Ваш заказ успешно оформлен и принят в обработку',
-                        icon: 'success',
-                        confirmButtonText: 'Перейти к заказам',
-                        confirmButtonColor: '#28a745',
-                        showConfirmButton: true,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'animated fadeInDown'
-                        }
-                    }).then((result) => {
+                    // Очищаем корзину в интерфейсе
+                    updateCartCount();
+                    
+                    // Создаем затемненный фон
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0, 0, 0, 0.5);
+                        z-index: 999;
+                    `;
+                    document.body.appendChild(overlay);
+                    
+                    // Показываем модальное окно успеха
+                    const successModal = document.querySelector('.success-modal');
+                    successModal.style.display = 'block';
+                    
+                    // Добавляем класс для анимации
+                    setTimeout(() => {
+                        successModal.classList.add('show');
+                    }, 10);
+
+                    // Автоматически перенаправляем через 3 секунды
+                    setTimeout(() => {
                         window.location.href = '/Order/History';
-                    });
+                    }, 3000);
                 } else {
                     Swal.fire({
                         title: 'Ошибка',
@@ -140,6 +173,11 @@
                     confirmButtonText: 'OK',
                     confirmButtonColor: '#dc3545'
                 });
+            })
+            .finally(() => {
+                // Восстанавливаем кнопку
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
             });
         }
     </script>
