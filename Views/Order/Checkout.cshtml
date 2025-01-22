@@ -50,20 +50,42 @@
                 <div class="card-body">
                     <h5 class="card-title">Данные доставки</h5>
                     <div class="mb-3">
-                        <label for="phoneNumber" class="form-label">Номер телефона</label>
-                        <input type="tel" id="phoneNumber" class="form-control" 
-                               placeholder="+7 (___) ___-__-__" />
-                        <div class="invalid-feedback">
-                            Пожалуйста, введите корректный номер телефона
+                        <label for="DeliveryAddress" class="form-label">Адрес доставки</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="DeliveryAddress" 
+                                   name="DeliveryAddress" 
+                                   placeholder="Город, улица, дом, квартира"
+                                   minlength="10"
+                                   maxlength="200"
+                                   required>
+                            <div class="invalid-feedback">
+                                Пожалуйста, введите корректный адрес доставки
+                            </div>
                         </div>
+                        <small class="text-muted">
+                            Пример: г. Москва, ул. Ленина, д. 1, кв. 123
+                        </small>
                     </div>
                     <div class="mb-3">
-                        <label for="deliveryAddress" class="form-label">Адрес доставки</label>
-                        <textarea id="deliveryAddress" class="form-control" rows="3" 
-                                placeholder="Введите адрес доставки"></textarea>
-                        <div class="invalid-feedback">
-                            Пожалуйста, введите корректный адрес доставки (минимум 10 символов)
+                        <label for="PhoneNumber" class="form-label">Номер телефона</label>
+                        <div class="input-group">
+                            <span class="input-group-text">+7</span>
+                            <input type="tel" 
+                                   class="form-control" 
+                                   id="PhoneNumber" 
+                                   name="PhoneNumber" 
+                                   placeholder="(XXX) XXX-XX-XX"
+                                   maxlength="15"
+                                   required>
+                            <div class="invalid-feedback">
+                                Пожалуйста, введите корректный номер телефона
+                            </div>
                         </div>
+                        <small class="text-muted">
+                            Формат: +7 (XXX) XXX-XX-XX
+                        </small>
                     </div>
                     <div class="mb-3">
                         <label for="comment" class="form-label">Комментарий к заказу</label>
@@ -117,37 +139,72 @@
 </div>
 
 @section Scripts {
-    <script src="https://unpkg.com/imask"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
-        // Маска для телефона
-        IMask(document.getElementById('phoneNumber'), {
-            mask: '+{7} (000) 000-00-00'
+        $(document).ready(function(){
+            if($.fn.mask) {
+                $('#PhoneNumber').mask('(000) 000-00-00', {
+                    placeholder: "(___) ___-__-__"
+                });
+            } else {
+                console.error('jQuery Mask Plugin не загружен');
+            }
+        });
+
+        // Валидация формы
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // Очистка маски телефона перед отправкой
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var phone = document.getElementById('PhoneNumber');
+            phone.value = phone.value.replace(/\D/g, '');
         });
 
         function placeOrder() {
-            const deliveryAddress = document.getElementById('deliveryAddress').value;
-            const phoneNumber = document.getElementById('phoneNumber').value;
+            const deliveryAddress = document.getElementById('DeliveryAddress').value;
+            const phoneNumber = document.getElementById('PhoneNumber').value;
             
             // Валидация
             let isValid = true;
             
-            if (!deliveryAddress || deliveryAddress.length < 10) {
-                document.getElementById('deliveryAddress').classList.add('is-invalid');
+            // Проверка адреса: должен содержать буквы и цифры
+            const addressRegex = /^[а-яА-Я].*\d+.*$/;
+            if (!deliveryAddress || deliveryAddress.length < 10 || !addressRegex.test(deliveryAddress)) {
+                document.getElementById('DeliveryAddress').classList.add('is-invalid');
                 isValid = false;
             } else {
-                document.getElementById('deliveryAddress').classList.remove('is-invalid');
+                document.getElementById('DeliveryAddress').classList.remove('is-invalid');
             }
             
-            if (!phoneNumber || phoneNumber.replace(/\D/g, '').length !== 11) {
-                document.getElementById('phoneNumber').classList.add('is-invalid');
+            // Проверка телефона: ровно 10 цифр после очистки от маски
+            const cleanPhone = phoneNumber.replace(/\D/g, '');
+            if (!phoneNumber || cleanPhone.length !== 10) {
+                document.getElementById('PhoneNumber').classList.add('is-invalid');
                 isValid = false;
             } else {
-                document.getElementById('phoneNumber').classList.remove('is-invalid');
+                document.getElementById('PhoneNumber').classList.remove('is-invalid');
             }
             
             if (!isValid) {
+                showNotification('Пожалуйста, заполните все обязательные поля корректно', 'error');
                 return;
             }
+
+            // Форматируем телефон перед отправкой
+            const formattedPhone = '+7' + phoneNumber.replace(/\D/g, '');
 
             // Показываем индикатор загрузки на кнопке
             const submitButton = document.querySelector('button[onclick="placeOrder()"]');
@@ -162,7 +219,7 @@
                 },
                 body: JSON.stringify({ 
                     deliveryAddress: deliveryAddress,
-                    phoneNumber: phoneNumber
+                    phoneNumber: formattedPhone
                 })
             })
             .then(response => response.json())
