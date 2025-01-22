@@ -91,9 +91,9 @@ namespace BootS.Controllers
         public async Task<IActionResult> IsInWishlist(int productId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var exists = await _context.Wishlist
+            var isInWishlist = await _context.Wishlist
                 .AnyAsync(w => w.UserId == userId && w.ProductId == productId);
-            return Json(new { isInWishlist = exists });
+            return Json(new { isInWishlist });
         }
     }
 } 

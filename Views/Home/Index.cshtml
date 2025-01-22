@@ -75,6 +75,22 @@
                     const productId = this.getAttribute('data-product-id');
                     addToWishlist(productId, this);
                 });
+
+                // Проверяем статус товара в списке желаемого
+                const productId = button.getAttribute('data-product-id');
+                fetch(`/Wishlist/IsInWishlist?productId=${productId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.isInWishlist) {
+                            const icon = button.querySelector('i');
+                            if (icon) {
+                                icon.classList.remove('bi-heart');
+                                icon.classList.add('bi-heart-fill');
+                                button.classList.add('in-wishlist');
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error checking wishlist status:', error));
             });
         });
 
