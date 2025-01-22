@@ -5,6 +5,8 @@ using BootS.Models;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BootS.Controllers
 {
@@ -32,28 +34,46 @@ namespace BootS.Controllers
                 return View(model);
             }
 
-            // Получаем username вместо userId
-            var username = User.Identity?.Name;
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+            var user = await _context.Users.FindAsync(int.Parse(userId));
+            if (user == null) return NotFound();
 
-            // Проверяем текущий пароль
             if (user.Password != model.CurrentPassword)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Неверный текущий пароль" });
+                }
                 ModelState.AddModelError("CurrentPassword", "Неверный текущий пароль");
                 return View(model);
             }
 
-            // Обновляем пароль
             user.Password = model.NewPassword;
             await _context.SaveChangesAsync();
 
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Json(new { success = true, message = "Пароль успешно изменен" });
+            }
+
             TempData["SuccessMessage"] = "Пароль успешно изменен";
-            return RedirectToAction("Index", "Profile");
+            return RedirectToAction("Index", "Home");
+        }
+
+        private string HashPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
+            }
+        }
+
+        private bool VerifyPassword(string password, string hashedPassword)
+        {
+            return HashPassword(password) == hashedPassword;
         }
     }
 } 
