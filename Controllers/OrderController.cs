@@ -53,6 +53,11 @@ namespace BootS.Controllers
                     return BadRequest(new { message = "Адрес доставки обязателен" });
                 }
 
+                if (string.IsNullOrWhiteSpace(model.PhoneNumber))
+                {
+                    return BadRequest(new { message = "Номер телефона обязателен" });
+                }
+
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId == null) return Unauthorized();
 
@@ -95,6 +100,7 @@ namespace BootS.Controllers
                         OrderDate = DateTime.Now,
                         TotalAmount = totalAmount,
                         DeliveryAddress = model.DeliveryAddress,
+                        PhoneNumber = model.PhoneNumber,
                         Status = "Новый"
                     };
 
@@ -159,6 +165,8 @@ namespace BootS.Controllers
 
     public class PlaceOrderModel
     {
-        public string DeliveryAddress { get; set; }
+        public string DeliveryAddress { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string? Comment { get; set; }
     }
 } 

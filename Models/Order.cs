@@ -6,16 +6,14 @@ namespace BootS.Models
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
-        [Required]
-        [StringLength(50)]
-        public string Status { get; set; } = "Новый";
-        [Required]
-        [StringLength(500)]
         public string DeliveryAddress { get; set; } = string.Empty;
-        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        
+        public virtual User User { get; set; } = null!;
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 
     public class OrderItem
