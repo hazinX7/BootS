@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using hazinDNS_v2.Data;
+using BootS.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
-using hazinDNS_v2.Controllers;
+using BootS.Controllers;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Localization;
 
-namespace hazinDNS_v2
+namespace BootS
 {
     public class Program
     {
@@ -30,7 +30,7 @@ namespace hazinDNS_v2
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie = new CookieBuilder
                 {
-                    Name = ".hazinDNS.Session",
+                    Name = ".BootS.Session",
                     HttpOnly = true,
                     IsEssential = true,
                     SameSite = SameSiteMode.Lax
@@ -62,7 +62,7 @@ namespace hazinDNS_v2
             builder.Services.AddAuthentication("Cookies")
                 .AddCookie("Cookies", options =>
                 {
-                    options.Cookie.Name = ".hazinDNS.Auth";
+                    options.Cookie.Name = ".BootS.Auth";
                     options.LoginPath = "/Home/Login";
                     options.LogoutPath = "/Home/Logout";
                     options.ExpireTimeSpan = TimeSpan.FromDays(1);
@@ -70,7 +70,24 @@ namespace hazinDNS_v2
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Initialize Database
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try 
+                {
+                    var context = services.GetRequiredService<ApplicationDbContext>();
+                    context.Database.EnsureCreated();
+                    DbInitializer.Initialize(context);
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "Произошла ошибка при инициализации базы данных.");
+                }
+            }
+
+            // Configure middleware
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -87,6 +104,7 @@ namespace hazinDNS_v2
 
             app.UseRequestLocalization();
 
+            // Configure routes
             app.MapControllerRoute(
                 name: "profile",
                 pattern: "Profile",
@@ -98,33 +116,13 @@ namespace hazinDNS_v2
                 defaults: new { controller = "Wishlist", action = "Index" });
 
             app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
-
-            app.MapControllerRoute(
                 name: "admin",
                 pattern: "admin/{action=Index}/{id?}",
                 defaults: new { controller = "Admin" });
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try 
-                {
-                    var context = services.GetRequiredService<ApplicationDbContext>();
-                    // Убедимся, что база данных создана и применены все миграции
-                    context.Database.EnsureCreated();
-                    
-                    // Теперь можно обновлять продукты
-                    DbInitializer.UpdateProducts(context);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "Произошла ошибка при инициализации базы данных.");
-                    throw;
-                }
-            }
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }

@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using hazinDNS_v2.Data;
+using BootS.Data;
 using Microsoft.EntityFrameworkCore;
+using BootS.Models;
 
-namespace hazinDNS_v2.Controllers
+namespace BootS.Controllers
 {
     public class CategoryController : Controller
     {

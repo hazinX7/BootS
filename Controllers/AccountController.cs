@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using hazinDNS_v2.Data;
-using hazinDNS_v2.Models;
+using BootS.Data;
+using BootS.Models;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace hazinDNS_v2.Controllers
+namespace BootS.Controllers
 {
     public class AccountController : Controller
     {

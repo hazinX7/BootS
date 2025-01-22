@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using hazinDNS_v2.Models;
-using hazinDNS_v2.Data;
+using BootS.Models;
+using BootS.Data;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
-namespace hazinDNS_v2.Controllers
+namespace BootS.Controllers
 {
     [Authorize]
     [Route("[controller]")]

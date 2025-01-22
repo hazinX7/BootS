@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace hazinDNS_v2.Models
+namespace BootS.Models
 {
     public class Wishlist
     {

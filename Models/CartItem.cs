@@ -1,4 +1,4 @@
-namespace hazinDNS_v2.Models
+namespace BootS.Models
 {
     public class CartItem
     {

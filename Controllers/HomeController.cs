@@ -1,11 +1,11 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using hazinDNS_v2.Models;
+using BootS.Models;
 using Microsoft.AspNetCore.Authorization;
-using hazinDNS_v2.Data;
+using BootS.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace hazinDNS_v2.Controllers
+namespace BootS.Controllers
 {
     public class HomeController : Controller
     {

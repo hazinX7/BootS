@@ -3,14 +3,14 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using hazinDNS_v2.Models;
-using hazinDNS_v2.Data;
+using BootS.Models;
+using BootS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 
-namespace hazinDNS_v2.Controllers
+namespace BootS.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -19,14 +19,12 @@ namespace hazinDNS_v2.Controllers
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<AuthController> _logger;
-        private readonly CartController _cartController;
 
-        public AuthController(IConfiguration configuration, ApplicationDbContext context, ILogger<AuthController> logger, CartController cartController)
+        public AuthController(IConfiguration configuration, ApplicationDbContext context, ILogger<AuthController> logger)
         {
             _configuration = configuration;
             _context = context;
             _logger = logger;
-            _cartController = cartController;
         }
 
         [HttpPost("login")]

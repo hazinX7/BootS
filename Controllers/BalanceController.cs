@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using hazinDNS_v2.Data;
+using BootS.Data;
 using Microsoft.EntityFrameworkCore;
-using hazinDNS_v2.Models;
+using BootS.Models;
 
-namespace hazinDNS_v2.Controllers
+namespace BootS.Controllers
 {
     [Authorize]
     public class BalanceController : Controller
