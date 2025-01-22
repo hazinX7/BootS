@@ -223,6 +223,73 @@
         .btn-outline-primary.in-wishlist:hover .bi-heart-fill {
             opacity: 0.8;  /* Небольшое затемнение при наведении */
         }
+
+        /* Стили для модального окна SweetAlert */
+        .swal2-popup {
+            border-radius: 15px !important;
+            padding: 2rem !important;
+        }
+
+        .swal2-title {
+            font-size: 1.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+
+        /* Уменьшаем размер иконок */
+        .swal2-icon {
+            width: 3em !important;  /* Уменьшаем ширину */
+            height: 3em !important; /* Уменьшаем высоту */
+            margin: 1rem auto !important;
+            font-size: 1rem !important; /* Уменьшаем базовый размер шрифта иконки */
+        }
+
+        /* Корректируем размер внутренних элементов иконки */
+        .swal2-icon .swal2-icon-content {
+            font-size: 1.75em !important; /* Уменьшаем размер символа внутри иконки */
+        }
+
+        .swal2-actions {
+            margin-top: 1.5rem !important;
+        }
+
+        .swal2-confirm {
+            background-color: #dc3545 !important;
+            border-radius: 8px !important;
+            padding: 8px 25px !important;
+            font-size: 1rem !important;
+        }
+
+        .swal2-cancel {
+            background-color: #6c757d !important;
+            border-radius: 8px !important;
+            padding: 8px 25px !important;
+            font-size: 1rem !important;
+        }
+
+        .swal2-confirm:focus, .swal2-cancel:focus {
+            box-shadow: none !important;
+        }
+
+        /* Стили для тостов */
+        .swal2-toast {
+            padding: 0.5rem !important;
+        }
+
+        .swal2-toast .swal2-icon {
+            width: 2em !important;  /* Еще меньше для тостов */
+            height: 2em !important;
+            margin: 0 0.5rem 0 0 !important;
+        }
+
+        .swal2-toast .swal2-icon .swal2-icon-content {
+            font-size: 1.25em !important;
+        }
+
+        .swal2-toast .swal2-title {
+            font-size: 1rem !important;
+            margin: 0 !important;
+            padding: 0.5rem 0 !important;
+        }
     </style>
 </head>
 <body>
