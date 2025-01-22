@@ -49,6 +49,17 @@
     border-bottom: none;
 }
 
+/* Стили для изображений товаров */
+.table img {
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    padding: 4px;
+}
+
+.table .d-flex {
+    gap: 15px;
+}
+
 /* Стили для формы адреса */
 .form-control {
     border: 1px solid #ced4da;
