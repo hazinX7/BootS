@@ -107,6 +107,15 @@
 
         .btn-primary {
             padding: 0.5rem 1.5rem;
+            outline: none !important;  /* Убираем outline при фокусе */
+            box-shadow: none !important;  /* Убираем тень при фокусе */
+        }
+
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary:active:focus {
+            outline: none !important;
+            box-shadow: none !important;
         }
 
         #profileItem {
@@ -183,6 +192,15 @@
             border: none;
             background: transparent;
             padding: 0.5rem;
+            outline: none !important;  /* Убираем outline при фокусе */
+            box-shadow: none !important;  /* Убираем тень при фокусе */
+        }
+
+        .btn-outline-primary:focus,
+        .btn-outline-primary:active {
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
         }
 
         .btn-outline-primary:hover {
