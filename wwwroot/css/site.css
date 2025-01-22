@@ -217,3 +217,26 @@ body {
 .category-card .btn {
     width: 100%;
 }
+
+.btn-outline-primary.in-wishlist {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-outline-primary.in-wishlist:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-outline-primary.in-wishlist i {
+    color: #dc3545;
+}
+
+.btn-outline-primary.in-wishlist:hover i {
+    color: white;
+}
+
+.bi-heart, .bi-heart-fill {
+    font-size: 1.2rem;
+}

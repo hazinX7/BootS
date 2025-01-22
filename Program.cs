@@ -59,13 +59,11 @@ namespace BootS
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddAuthentication("Cookies")
-                .AddCookie("Cookies", options =>
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
                 {
-                    options.Cookie.Name = ".BootS.Auth";
                     options.LoginPath = "/Home/Login";
                     options.LogoutPath = "/Home/Logout";
-                    options.ExpireTimeSpan = TimeSpan.FromDays(1);
                 });
 
             var app = builder.Build();
@@ -74,7 +72,7 @@ namespace BootS
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                try 
+                try
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
                     context.Database.EnsureCreated();
@@ -83,7 +81,7 @@ namespace BootS
                 catch (Exception ex)
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "Произошла ошибка при инициализации базы данных.");
+                    logger.LogError(ex, "An error occurred while seeding the database.");
                 }
             }
 
@@ -91,8 +89,10 @@ namespace BootS
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
 
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

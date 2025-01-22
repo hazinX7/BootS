@@ -12,6 +12,12 @@ namespace BootS.Data
         {
             context.Database.EnsureCreated();
 
+            // Проверяем и создаем таблицу Wishlist если её нет
+            if (!context.Wishlist.Any())
+            {
+                // Таблица создастся автоматически
+            }
+
             // Проверяем, есть ли уже товары
             if (context.Products.Any())
             {

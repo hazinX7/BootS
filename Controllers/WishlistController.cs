@@ -4,6 +4,7 @@ using BootS.Data;
 using BootS.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace BootS.Controllers
 {
@@ -11,10 +12,12 @@ namespace BootS.Controllers
     public class WishlistController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<WishlistController> _logger;
 
-        public WishlistController(ApplicationDbContext context)
+        public WishlistController(ApplicationDbContext context, ILogger<WishlistController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -28,27 +31,44 @@ namespace BootS.Controllers
         }
 
         [HttpPost]
+        [Route("Wishlist/AddToWishlist")]
         public async Task<IActionResult> AddToWishlist([FromBody]int productId)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-            var existingItem = await _context.Wishlist
-                .FirstOrDefaultAsync(w => w.UserId == userId && w.ProductId == productId);
-
-            if (existingItem == null)
+            try
             {
-                var wishlistItem = new Wishlist
+                _logger.LogInformation($"Attempting to add product {productId} to wishlist");
+                
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId))
                 {
-                    UserId = userId,
-                    ProductId = productId,
-                    DateAdded = DateTime.Now
-                };
+                    _logger.LogWarning("User ID not found");
+                    return Json(new { success = false, message = "Пожалуйста, войдите в систему" });
+                }
 
-                _context.Wishlist.Add(wishlistItem);
-                await _context.SaveChangesAsync();
+                var existingItem = await _context.Wishlist
+                    .FirstOrDefaultAsync(w => w.UserId == userId && w.ProductId == productId);
+
+                if (existingItem == null)
+                {
+                    var wishlistItem = new Wishlist
+                    {
+                        UserId = userId,
+                        ProductId = productId,
+                        DateAdded = DateTime.Now
+                    };
+
+                    _context.Wishlist.Add(wishlistItem);
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation($"Product {productId} added to wishlist for user {userId}");
+                }
+
+                return Json(new { success = true });
             }
-
-            return Json(new { success = true });
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error adding product to wishlist: {ex.Message}");
+                return Json(new { success = false, message = "Произошла ошибка при добавлении товара" });
+            }
         }
 
         [HttpPost]

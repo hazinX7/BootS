@@ -21,62 +21,20 @@ namespace BootS.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<CartItem>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                
-                entity.HasOne(d => d.Product)
-                    .WithMany()
-                    .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<CartItem>()
+                .HasOne(c => c.Product)
+                .WithMany()
+                .HasForeignKey(c => c.ProductId);
 
-                entity.Property(e => e.CartId)
-                    .IsRequired();
-            });
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(o => o.Product)
+                .WithMany()
+                .HasForeignKey(o => o.ProductId);
 
-            modelBuilder.Entity<Order>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                
-                entity.HasOne(d => d.User)
-                    .WithMany()
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.Property(e => e.DeliveryAddress)
-                    .IsRequired();
-
-                entity.Property(e => e.TotalAmount)
-                    .HasColumnType("decimal(18,2)");
-
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.OrderDate)
-                    .HasColumnType("datetime2");
-            });
-
-            modelBuilder.Entity<OrderItem>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                
-                entity.HasOne(d => d.Order)
-                    .WithMany(p => p.OrderItems)
-                    .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(d => d.Product)
-                    .WithMany()
-                    .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.Property(e => e.Price)
-                    .HasColumnType("decimal(18,2)");
-
-                entity.Property(e => e.Quantity)
-                    .IsRequired();
-            });
+            modelBuilder.Entity<Wishlist>()
+                .HasOne(w => w.Product)
+                .WithMany()
+                .HasForeignKey(w => w.ProductId);
         }
     }
 } 

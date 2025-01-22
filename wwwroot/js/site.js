@@ -6,27 +6,80 @@
 // Проверяем наличие токена при загрузке страницы
 window.onload = function() {
     const token = localStorage.getItem('jwt_token');
+    const loginItem = document.getElementById('loginItem');
+    const profileItem = document.getElementById('profileItem');
+    const userBalance = document.getElementById('userBalance');
+
     if (token) {
-        document.getElementById('loginItem').style.display = 'none';
-        document.getElementById('profileItem').style.display = 'block';
+        if (loginItem) loginItem.style.display = 'none';
+        if (profileItem) profileItem.style.display = 'block';
         
-        // Декодируем JWT токен для получения имени пользователя
         const payload = JSON.parse(atob(token.split('.')[1]));
         const userName = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
-        document.getElementById('userName').textContent = userName;
+        const userNameElement = document.getElementById('userName');
+        if (userNameElement) userNameElement.textContent = userName;
     } else {
-        document.getElementById('loginItem').style.display = 'block';
-        document.getElementById('profileItem').style.display = 'none';
+        if (loginItem) loginItem.style.display = 'block';
+        if (profileItem) profileItem.style.display = 'none';
+    }
+
+    if (userBalance) {
+        updateUserBalance();
     }
     updateCartCount();
 }
 
-// Функция выхода теперь будет в личном кабинете
+function updateCartCount() {
+    fetch('/Cart/GetCartCount', {
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const cartCountElement = document.getElementById('cartItemCount');
+        if (cartCountElement) {
+            cartCountElement.textContent = data.count || 0;
+        }
+    })
+    .catch(error => {
+        console.error('Error updating cart count:', error);
+    });
+}
+
+function updateUserBalance() {
+    fetch('/Balance/GetBalance')
+        .then(response => response.json())
+        .then(data => {
+            const balanceElement = document.getElementById('userBalance');
+            if (balanceElement) {
+                balanceElement.textContent = data.balance.toLocaleString('ru-RU');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Ошибка при обновлении баланса', 'error');
+        });
+}
+
 function logout() {
-    if (confirm('Вы уверены, что хотите выйти?')) {
+    fetch('/api/Auth/logout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        showNotification('Вы успешно вышли из системы');
         localStorage.removeItem('jwt_token');
         window.location.href = '/Home/Login';
-    }
+    })
+    .catch(error => {
+        console.error('Error during logout:', error);
+        showNotification('Произошла ошибка при выходе из системы', 'error');
+        localStorage.removeItem('jwt_token');
+        window.location.href = '/Home/Login';
+    });
 }
 
 function updateQuantity(productId, delta) {
@@ -71,3 +124,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function showNotification(message, icon = 'success') {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+
+    Toast.fire({
+        icon: icon,
+        title: message
+    });
+}

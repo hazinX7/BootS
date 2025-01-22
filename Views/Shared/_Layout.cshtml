@@ -1,15 +1,14 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - BootS</title>
     <link rel="icon" type="image/png" href="~/favicon.png">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -256,38 +255,32 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script>
-        // Конфигурация Toastr
-        toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-bottom-right",
-            "timeOut": "3000"
-        };
-
         function updateUserBalance() {
             fetch('/Balance/GetBalance')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('userBalance').textContent = data.balance.toLocaleString('ru-RU');
+                    const balanceElement = document.getElementById('userBalance');
+                    if (balanceElement) {
+                        balanceElement.textContent = data.balance.toLocaleString('ru-RU');
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    toastr.error('Ошибка при обновлении баланса');
+                    showNotification('Ошибка при обновлении баланса', 'error');
                 });
         }
 
         window.onload = function() {
-            if (document.getElementById('userBalance')) {
+            updateCartCount();
+            const balanceElement = document.getElementById('userBalance');
+            if (balanceElement) {
                 updateUserBalance();
             }
-            updateCartCount();
         }
 
-        // Функция выхода
         function logout() {
             fetch('/api/Auth/logout', {
                 method: 'POST',
@@ -296,12 +289,12 @@
                 }
             })
             .then(response => {
-                toastr.success('Вы успешно вышли из системы');
+                showNotification('Вы успешно вышли из системы');
                 window.location.href = '/Home/Login';
             })
             .catch(error => {
                 console.error('Error during logout:', error);
-                toastr.error('Произошла ошибка при выходе из системы');
+                showNotification('Произошла ошибка при выходе из системы', 'error');
                 window.location.href = '/Home/Login';
             });
         }
@@ -337,7 +330,7 @@
             .then(response => {
                 console.log('Response status:', response.status);
                 if (response.status === 401) {
-                    toastr.error('Необходима авторизация');
+                    showNotification('Необходима авторизация', 'error');
                     window.location.href = '/Home/Login';
                     return;
                 }
@@ -348,17 +341,17 @@
                 console.log('Response data:', data);
                 if (data.success) {
                     updateCartCount();
-                    toastr.success('Товар добавлен в корзину');
+                    showNotification('Товар добавлен в корзину');
                     if (window.location.pathname === '/Cart' || window.location.pathname === '/Cart/Index') {
                         window.location.reload();
                     }
                 } else if (data.message) {
-                    toastr.warning(data.message);
+                    showNotification(data.message, 'warning');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                toastr.error('Произошла ошибка при добавлении товара в корзину');
+                showNotification('Произошла ошибка при добавлении товара в корзину', 'error');
             });
         }
 
@@ -384,16 +377,16 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            toastr.success('Товар успешно удален из корзины');
+                            showNotification('Товар успешно удален из корзины');
                             window.location.reload();
                         }
                         else {
-                            toastr.error('Не удалось удалить товар');
+                            showNotification('Не удалось удалить товар', 'error');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        toastr.error('Произошла ошибка при удалении товара');
+                        showNotification('Произошла ошибка при удалении товара', 'error');
                     });
                 }
             });
@@ -420,16 +413,16 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            toastr.success('Корзина успешно очищена');
+                            showNotification('Корзина успешно очищена');
                             window.location.reload();
                         }
                         else {
-                            toastr.error('Не удалось очистить корзину');
+                            showNotification('Не удалось очистить корзину', 'error');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        toastr.error('Произошла ошибка при очистке корзины');
+                        showNotification('Произошла ошибка при очистке корзины', 'error');
                     });
                 }
             });
@@ -439,7 +432,7 @@
             fetch('/Cart')
                 .then(response => {
                     if (response.status === 401) {
-                        toastr.error('Необходима авторизация');
+                        showNotification('Необходима авторизация', 'error');
                         window.location.href = '/Home/Login';
                         return;
                     }
@@ -482,7 +475,7 @@
                 })
                 .then(response => {
                     if (response.status === 401) {
-                        toastr.error('Необходима авторизация');
+                        showNotification('Необходима авторизация', 'error');
                         window.location.href = '/Home/Login';
                         return;
                     }
@@ -493,12 +486,12 @@
                     if (data.success) {
                         button.classList.remove('in-wishlist');
                         button.querySelector('i').classList.remove('text-danger');
-                        toastr.success('Товар удален из списка желаемого');
+                        showNotification('Товар удален из списка желаемого');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    toastr.error('Произошла ошибка при удалении товара');
+                    showNotification('Произошла ошибка при удалении товара', 'error');
                 });
                 return;
             }
@@ -513,7 +506,7 @@
             })
             .then(response => {
                 if (response.status === 401) {
-                    toastr.error('Необходима авторизация');
+                    showNotification('Необходима авторизация', 'error');
                     window.location.href = '/Home/Login';
                     return;
                 }
@@ -524,12 +517,12 @@
                 if (data.success) {
                     button.classList.add('in-wishlist');
                     button.querySelector('i').classList.add('text-danger');
-                    toastr.success('Товар добавлен в список желаемого');
+                    showNotification('Товар добавлен в список желаемого');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                toastr.error('Произошла ошибка при добавлении товара');
+                showNotification('Произошла ошибка при добавлении товара', 'error');
             });
         }
 
