@@ -54,7 +54,7 @@
                             <div class="d-flex justify-content-between">
                                 <button class="btn btn-primary" onclick="addToCart(@product.Id)">В корзину</button>
                                 <button class="btn btn-outline-primary" data-product-id="@product.Id">
-                                    <i class="bi bi-heart"></i>
+                                    <i class="bi bi-heart-fill"></i>
                                 </button>
                             </div>
                         </div>
@@ -82,12 +82,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.isInWishlist) {
-                            const icon = button.querySelector('i');
-                            if (icon) {
-                                icon.classList.remove('bi-heart');
-                                icon.classList.add('bi-heart-fill');
-                                button.classList.add('in-wishlist');
-                            }
+                            button.classList.add('in-wishlist');
                         }
                     })
                     .catch(error => console.error('Error checking wishlist status:', error));
@@ -119,36 +114,63 @@
                 return;
             }
 
-            fetch('/Wishlist/AddToWishlist', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(parseInt(productId))
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    const icon = button.querySelector('i');
-                    if (icon) {
-                        icon.classList.remove('bi-heart');
-                        icon.classList.add('bi-heart-fill');
-                        button.classList.add('in-wishlist');
+            const isInWishlist = button.classList.contains('in-wishlist');
+
+            if (isInWishlist) {
+                // Удаляем из списка желаемого
+                fetch('/Wishlist/RemoveFromWishlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(parseInt(productId))
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                    showNotification('Товар добавлен в избранное');
-                } else {
-                    throw new Error(data.message || 'Произошла ошибка');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Не удалось добавить товар в избранное', 'error');
-            });
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        button.classList.remove('in-wishlist');
+                        showNotification('Товар удален из избранного');
+                    } else {
+                        throw new Error(data.message || 'Произошла ошибка');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Не удалось удалить товар из избранного', 'error');
+                });
+            } else {
+                // Добавляем в список желаемого
+                fetch('/Wishlist/AddToWishlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(parseInt(productId))
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        button.classList.add('in-wishlist');
+                        showNotification('Товар добавлен в избранное');
+                    } else {
+                        throw new Error(data.message || 'Произошла ошибка');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Не удалось добавить товар в избранное', 'error');
+                });
+            }
         }
 
         function addToCart(productId) {

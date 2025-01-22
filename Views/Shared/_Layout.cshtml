@@ -142,8 +142,12 @@
             color: white;
         }
 
-        .btn-outline-primary.in-wishlist:hover i {
+        .btn-outline-primary.in-wishlist:hover .bi-heart-fill {
             color: white !important;
+        }
+
+        .btn-outline-primary:not(.in-wishlist):hover .bi-heart {
+            color: #0d6efd;
         }
 
         #toast-container > div {
@@ -172,6 +176,34 @@
             top: 50%;
             transform: translateY(-50%);
             color: #6c757d;
+        }
+
+        /* Стили для кнопки избранного */
+        .btn-outline-primary {
+            border: none;
+            background: transparent;
+            padding: 0.5rem;
+        }
+
+        .btn-outline-primary:hover {
+            background: transparent;
+        }
+
+        .btn-outline-primary .bi-heart-fill {
+            color: #6c757d;  /* Серый цвет по умолчанию */
+            font-size: 1.2rem;
+        }
+
+        .btn-outline-primary:hover .bi-heart-fill {
+            color: #dc3545;  /* Красный цвет при наведении */
+        }
+
+        .btn-outline-primary.in-wishlist .bi-heart-fill {
+            color: #dc3545;  /* Красный цвет когда в избранном */
+        }
+
+        .btn-outline-primary.in-wishlist:hover .bi-heart-fill {
+            opacity: 0.8;  /* Небольшое затемнение при наведении */
         }
     </style>
 </head>
