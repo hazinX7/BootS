@@ -17,84 +17,98 @@
 
                 <div class="payment-methods">
                     <div class="payment-tabs">
-                        <button type="button" class="payment-tab active" data-method="card">
+                        <button type="button" class="payment-tab active" data-form="cardForm">
                             <i class="bi bi-credit-card"></i>
                             <span>Банковская карта</span>
                         </button>
-                        <button type="button" class="payment-tab" data-method="sbp">
+                        <button type="button" class="payment-tab" data-form="sbpForm">
                             <i class="bi bi-phone"></i>
                             <span>СБП</span>
                         </button>
                     </div>
 
-                    <!-- Форма оплаты картой -->
-                    <div class="payment-form active" id="cardForm">
-                        <form id="cardPaymentForm" novalidate>
-                            <div class="form-group">
-                                <label>Номер карты</label>
-                                <input type="text" class="form-control" id="cardNumber" required 
-                                       pattern="\d{16}" maxlength="19" placeholder="0000 0000 0000 0000">
-                                <div class="invalid-feedback">Введите корректный номер карты</div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group col-6">
-                                    <label>Срок действия</label>
-                                    <input type="text" class="form-control" id="expiryDate" required
-                                           pattern="\d{2}/\d{2}" maxlength="5" placeholder="MM/YY">
-                                    <div class="invalid-feedback">Введите корректный срок действия</div>
+                    <div class="payment-forms">
+                        <!-- Форма оплаты картой -->
+                        <div class="payment-form active" id="cardForm">
+                            <form id="cardPaymentForm" novalidate>
+                                <div class="form-group">
+                                    <label>Номер карты</label>
+                                    <input type="text" class="form-control" id="cardNumber" required 
+                                           pattern="\d{16}" maxlength="19" placeholder="0000 0000 0000 0000">
+                                    <div class="invalid-feedback">Введите корректный номер карты</div>
                                 </div>
-                                <div class="form-group col-6">
-                                    <label>CVV</label>
-                                    <input type="password" class="form-control" id="cvv" required
-                                           pattern="\d{3}" maxlength="3" placeholder="***">
-                                    <div class="invalid-feedback">Введите CVV код</div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-6">
+                                        <label>Срок действия</label>
+                                        <input type="text" class="form-control" id="expiryDate" required
+                                               pattern="\d{2}/\d{2}" maxlength="5" placeholder="MM/YY">
+                                        <div class="invalid-feedback">Введите корректный срок действия</div>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label>CVV</label>
+                                        <input type="password" class="form-control" id="cvv" required
+                                               pattern="\d{3}" maxlength="3" placeholder="***">
+                                        <div class="invalid-feedback">Введите CVV код</div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label>Сумма пополнения</label>
-                                <div class="amount-input">
-                                    <input type="number" class="form-control" id="cardAmount" required
-                                           min="1" max="750000" placeholder="Введите сумму">
-                                    <span class="currency">₽</span>
-                                    <div class="invalid-feedback">Сумма должна быть от 1 до 750 000 ₽</div>
+                                <div class="form-group">
+                                    <label>Сумма пополнения</label>
+                                    <div class="amount-input">
+                                        <input type="number" class="form-control" id="cardAmount" required
+                                               min="1" max="750000" placeholder="Введите сумму">
+                                        <span class="currency">₽</span>
+                                        <div class="invalid-feedback">Сумма должна быть от 1 до 750 000 ₽</div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <button type="submit" class="btn-submit">
-                                <i class="bi bi-lock-fill"></i>
-                                Пополнить
-                            </button>
-                        </form>
-                    </div>
+                                <button type="submit" class="btn-submit">
+                                    <i class="bi bi-lock-fill"></i>
+                                    Пополнить
+                                </button>
+                            </form>
+                        </div>
 
-                    <!-- Форма оплаты СБП -->
-                    <div class="payment-form" id="sbpForm">
-                        <form id="sbpPaymentForm" novalidate>
-                            <div class="form-group">
-                                <label>Номер телефона</label>
-                                <input type="tel" class="form-control" id="phoneNumber" required
-                                       pattern="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}" 
-                                       placeholder="+7 (___) ___-__-__">
-                                <div class="invalid-feedback">Введите корректный номер телефона</div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Сумма пополнения</label>
-                                <div class="amount-input">
-                                    <input type="number" class="form-control" id="sbpAmount" required
-                                           min="1" max="750000" placeholder="Введите сумму">
-                                    <span class="currency">₽</span>
-                                    <div class="invalid-feedback">Сумма должна быть от 1 до 750 000 ₽</div>
+                        <!-- Форма оплаты СБП -->
+                        <div class="payment-form" id="sbpForm">
+                            <form id="sbpPaymentForm" novalidate>
+                                <div class="form-group">
+                                    <label>Номер телефона</label>
+                                    <input type="tel" class="form-control" id="phoneNumber" required
+                                           placeholder="+7 (___) ___-__-__">
+                                    <div class="invalid-feedback">Введите корректный номер телефона</div>
                                 </div>
-                            </div>
 
-                            <button type="submit" class="btn-submit">
-                                <i class="bi bi-lock-fill"></i>
-                                Оплатить через СБП
-                            </button>
-                        </form>
+                                <div class="form-group">
+                                    <label>Банк отправителя</label>
+                                    <select class="form-control" id="bankSelect" required>
+                                        <option value="">Выберите банк</option>
+                                        <option value="sber">Сбербанк</option>
+                                        <option value="tinkoff">Тинькофф</option>
+                                        <option value="vtb">ВТБ</option>
+                                        <option value="alpha">Альфа-Банк</option>
+                                        <option value="other">Другой банк</option>
+                                    </select>
+                                    <div class="invalid-feedback">Выберите банк</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Сумма пополнения</label>
+                                    <div class="amount-input">
+                                        <input type="number" class="form-control" id="sbpAmount" required
+                                               min="1" max="750000" placeholder="Введите сумму">
+                                        <span class="currency">₽</span>
+                                        <div class="invalid-feedback">Сумма должна быть от 1 до 750 000 ₽</div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-submit">
+                                    <i class="bi bi-lock-fill"></i>
+                                    Оплатить через СБП
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -423,23 +437,40 @@
 
 @section Scripts {
     <script>
-        // Переключение между методами оплаты
+        // Заменим обработчик переключения методов оплаты
         document.querySelectorAll('.payment-tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 // Убираем активный класс у всех табов
-                document.querySelectorAll('.payment-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.payment-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
                 // Добавляем активный класс текущему табу
                 this.classList.add('active');
 
-                // Скрываем все формы
+                // Получаем ID формы для отображения
+                const formId = this.getAttribute('data-form');
+
+                // Скрываем все формы с анимацией
                 document.querySelectorAll('.payment-form').forEach(form => {
-                    form.classList.remove('active');
+                    form.style.opacity = '0';
+                    setTimeout(() => {
+                        form.style.display = 'none';
+                        form.classList.remove('active');
+                    }, 300);
                 });
 
-                // Показываем нужную форму
-                const method = this.dataset.method;
-                const form = document.getElementById(method + 'Form');
-                form.classList.add('active');
+                // Показываем нужную форму с анимацией
+                const targetForm = document.getElementById(formId);
+                if (targetForm) {
+                    setTimeout(() => {
+                        targetForm.style.display = 'block';
+                        targetForm.classList.add('active');
+                        setTimeout(() => {
+                            targetForm.style.opacity = '1';
+                        }, 50);
+                    }, 300);
+                }
             });
         });
 
@@ -473,17 +504,49 @@
         // Форматирование номера телефона
         const phoneNumber = document.getElementById('phoneNumber');
         phoneNumber.addEventListener('input', function(e) {
-            let value = this.value.replace(/\D/g, '');
-            if (value.length > 0) {
-                value = '+7' + value.slice(value.startsWith('7') ? 1 : 0);
-                if (value.length > 2) value = value.slice(0,2) + ' (' + value.slice(2);
-                if (value.length > 7) value = value.slice(0,7) + ') ' + value.slice(7);
-                if (value.length > 12) value = value.slice(0,12) + '-' + value.slice(12);
-                if (value.length > 15) value = value.slice(0,15) + '-' + value.slice(15);
+            let value = this.value.replace(/\D/g, ''); // Убираем все нецифровые символы
+            
+            // Ограничиваем длину до 11 цифр
+            if (value.length > 11) {
+                value = value.slice(0, 11);
             }
+            
+            // Форматируем номер
+            if (value.length > 0) {
+                // Если первая цифра не 7, добавляем её
+                if (value[0] !== '7') {
+                    value = '7' + value;
+                }
+                
+                let formattedValue = '+7';
+                if (value.length > 1) {
+                    formattedValue += ' (' + value.slice(1, 4);
+                }
+                if (value.length > 4) {
+                    formattedValue += ') ' + value.slice(4, 7);
+                }
+                if (value.length > 7) {
+                    formattedValue += '-' + value.slice(7, 9);
+                }
+                if (value.length > 9) {
+                    formattedValue += '-' + value.slice(9, 11);
+                }
+                value = formattedValue;
+            }
+            
             this.value = value;
-            validateInput(this, /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/);
+            validatePhoneNumber(this);
         });
+
+        // Функция валидации номера телефона
+        function validatePhoneNumber(input) {
+            const value = input.value;
+            const digitsOnly = value.replace(/\D/g, '');
+            const isValid = digitsOnly.length === 11 && digitsOnly[0] === '7';
+            
+            input.classList.toggle('is-invalid', !isValid);
+            return isValid;
+        }
 
         // Валидация полей
         function validateInput(input, pattern) {
@@ -579,7 +642,8 @@
         document.getElementById('sbpPaymentForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const phoneValid = validateInput(phoneNumber, /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/);
+            const phoneValid = validatePhoneNumber(phoneNumber);
+            const bankValid = bankSelect.value !== '';
             const amount = document.getElementById('sbpAmount');
             const amountValue = parseFloat(amount.value);
 
@@ -594,20 +658,23 @@
                 return;
             }
 
-            if (!phoneValid) {
+            if (!phoneValid || !bankValid) {
                 showNotification({
                     type: 'error',
                     title: 'Ошибка!',
-                    message: 'Введите корректный номер телефона'
+                    message: 'Пожалуйста, проверьте правильность заполнения полей'
                 });
                 return;
             }
 
+            // Подготавливаем данные в том же формате, что и для карты
             const data = {
-                cardNumber: "0000000000000000",
-                expiryDate: "01/99",
-                cvv: "000",
-                amount: amountValue
+                cardNumber: phoneNumber.value.replace(/\D/g, ''),  // Отправляем только цифры
+                expiryDate: "01/99", // Фиктивные данные для СБП
+                cvv: "000",          // Фиктивные данные для СБП
+                amount: amountValue,
+                paymentMethod: "SBP",
+                bank: bankSelect.value
             };
 
             submitPayment(data);
@@ -645,7 +712,7 @@
             fetch('/Balance/UpdateBalance', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             })
@@ -659,26 +726,30 @@
                         message: 'Баланс успешно пополнен'
                     });
                     
-                    // Обновляем отображение баланса на странице
-                    document.querySelector('.balance-amount').textContent = 
-                        new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' })
-                            .format(result.newBalance);
-                    
-                    // Обновляем баланс в шапке сайта
-                    const balanceText = `Баланс: ${new Intl.NumberFormat('ru-RU', { 
+                    // Форматируем новый баланс
+                    const formattedBalance = new Intl.NumberFormat('ru-RU', { 
                         style: 'currency', 
                         currency: 'RUB' 
-                    }).format(result.newBalance)}`;
-
-                    // Обновляем все возможные места отображения баланса
+                    }).format(result.newBalance);
+                    
+                    // Обновляем отображение баланса на странице
+                    document.querySelector('.balance-amount').textContent = formattedBalance;
+                    
+                    // Обновляем баланс в шапке сайта (все возможные места)
                     document.querySelectorAll('[data-balance]').forEach(el => {
-                        el.textContent = balanceText;
+                        el.textContent = `Баланс: ${formattedBalance}`;
                     });
 
                     // Обновляем баланс в навигационной панели
                     const navBalance = document.querySelector('.nav-link[href="/Balance"] span');
                     if (navBalance) {
-                        navBalance.textContent = balanceText;
+                        navBalance.textContent = formattedBalance;
+                    }
+
+                    // Обновляем баланс в хедере
+                    const headerBalance = document.querySelector('.header-balance');
+                    if (headerBalance) {
+                        headerBalance.textContent = `Баланс: ${formattedBalance}`;
                     }
 
                     // Очищаем формы
@@ -693,7 +764,6 @@
                 }
             })
             .catch(error => {
-                // Показываем уведомление об ошибке
                 showNotification({
                     type: 'error',
                     title: 'Ошибка!',
@@ -701,7 +771,6 @@
                 });
             })
             .finally(() => {
-                // Восстанавливаем кнопку
                 submitButton.innerHTML = originalText;
                 submitButton.disabled = false;
             });
